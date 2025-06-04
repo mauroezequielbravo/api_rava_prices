@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
@@ -138,29 +140,70 @@ def get_acciones() -> list:
     driver = webdriver.Chrome(options=options)
 
     try:
-        # Navegar a la página de cotizaciones
+        # Ir a la página
         driver.get("https://www.rava.com/cotizaciones/acciones-argentinas")
-        time.sleep(5)  # Esperar a que la página cargue completamente
 
-        # Obtener todas las tablas de cotizaciones
-        tables = driver.find_elements(By.CSS_SELECTOR, "div.rava-box-shadow.table-a")
+        # Esperar a que se cargue la primera tabla
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "tabla"))
+        )
 
-        # Verificar que se encontraron las tablas
-        if len(tables) >= 2:
-            # Extraer HTML de las tablas
-            html_lider = tables[0].get_attribute('outerHTML')
-            html_general = tables[1].get_attribute('outerHTML')
+        # Obtener HTML de la tabla inicial (Panel Líder)
+        tabla_lider = driver.find_element(By.ID, "tabla")
+        html_lider = tabla_lider.get_attribute('outerHTML')
+        df_lider = pd.read_html(html_lider)[0]
 
-            # Convertir HTML a DataFrame
-            df_lider = pd.read_html(html_lider)[0]
-            df_general = pd.read_html(html_general)[0]
+        df_lider.columns = [
+            'especie', 'ultimo_precio', 'porcentaje_diario', 'porcentaje_mes', 'porcentaje_anio', 
+            'precio_anterior', 'precio_apertura', 'precio_minimo', 'precio_maximo', 'hora', 'vol_nominal', 
+            'vol_efectivo'
+        ]
 
-            df_todo = pd.concat([df_lider, df_general], ignore_index=True)
-            return df_todo.to_dict(orient='records')
-        else:
-            print("No se encontraron las tablas esperadas.")
+        # df_lider = df_lider.iloc[1:].reset_index(drop=True)  # Eliminar la primera fila si es el encabezado
+        df_lider = df_lider.applymap(lambda x: x.replace('.', '').replace(',', '.') if isinstance(x, str) else x)  # Reemplazar puntos y comas
+        df_lider = df_lider.applymap(lambda x: float(x) if isinstance(x, str) and x.replace('.', '', 1).isdigit() else x)  # Convertir a float
+
+        # remplaza los guiones por none
+        df_lider = df_lider.replace('-', None)
+
+        # Hacer clic en el botón del Panel General
+        boton_general_xpath = '//*[@id="tabla"]/div/div/ul/li[2]/a'
+        boton_general = driver.find_element(By.XPATH, boton_general_xpath)
+        boton_general.click()
+
+        # Esperar a que se cargue la nueva tabla
+        # WebDriverWait(driver, 10).until(
+        #     EC.text_to_be_present_in_element((By.CSS_SELECTOR, "#tabla .nav-item.active"), "General")
+        # )
+        time.sleep(2)  # Esperar un poco para que la tabla se cargue completamente
+
+        # Volver a obtener la tabla del Panel General
+        tabla_general = driver.find_element(By.ID, "tabla")
+        html_general = tabla_general.get_attribute('outerHTML')
+        df_general = pd.read_html(html_general)[0]
+
+        df_general.columns = [
+            'especie', 'ultimo_precio', 'porcentaje_diario', 'porcentaje_mes', 'porcentaje_anio', 
+            'precio_anterior', 'precio_apertura', 'precio_minimo', 'precio_maximo', 'hora', 'vol_nominal', 
+            'vol_efectivo'
+        ]
+
+        # df_general = df_general.iloc[1:].reset_index(drop=True)  # Eliminar la primera fila si es el encabezado
+        df_general = df_general.applymap(lambda x: x.replace('.', '').replace(',', '.') if isinstance(x, str) else x)  # Reemplazar puntos y comas
+        df_general = df_general.applymap(lambda x: float(x) if isinstance(x, str) and x.replace('.', '', 1).isdigit() else x)  # Convertir a float
+
+        # remplaza los guiones por none
+        df_general = df_general.replace('-', None)
+
+        # Unir los dos DataFrames
+        df_total = pd.concat([df_lider, df_general], ignore_index=True)
+
+        return df_total.to_dict(orient='records')  # Convertir a lista de diccionarios
+    except Exception as e:
+        print(f"Error al obtener las acciones: {e}")
+        return []
+
     finally:
-        # Cerrar el navegador
-        driver.quit()   
+        driver.quit() 
 
 
