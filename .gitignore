@@ -1,0 +1,112 @@
+// generar un archivo .gitignore para un proyecto en python y fastapi
+# Python bytecode files
+__pycache__/
+*.py[cod]
+# C extensions
+*.so
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+.eggs/
+.eggs-info/
+.installed.cfg
+*.egg-info/
+.installed.cfg
+*.egg
+# PyInstaller
+#  Usually contains build artifacts, but can also contain other files
+#  that are not useful in a repository.
+#  See https://pyinstaller.readthedocs.io/en/stable/usage.html#using-pyinstaller
+#  for more information.
+*.spec
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.coverage
+*.py,cover
+# Translations
+*.mo
+*.pot
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+# Flask stuff:
+instance/
+.webassets-cache
+# Scrapy stuff:
+.scrapy
+# Sphinx documentation
+docs/_build/
+# PyBuilder
+target/
+# Jupyter Notebook
+.ipynb_checkpoints
+# IPython
+profile_default/
+ipython_config.py
+# pyenv
+.python-version
+# pipenv
+Pipfile.lock
+# poetry
+poetry.lock
+# pyproject.toml
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+# Pyre type checker
+.pyre/
+# pytype
+.pytype/
+# Cython debug symbols
+cython_debug/
+# FastAPI specific
+# If you are using FastAPI with Docker, you might want to ignore the following:
+docker-compose.override.yml
+docker-compose.prod.yml
+# If you are using FastAPI with a virtual environment, you might want to ignore the following:
+venv/
+.env
+# If you are using FastAPI with a database, you might want to ignore the following:
+*.sqlite3
+*.db
+# If you are using FastAPI with a cache, you might want to ignore the following:
+.cache/
+# If you are using FastAPI with a logs directory, you might want to ignore the following:
+logs/
+# If you are using FastAPI with a static files directory, you might want to ignore the following:
+static/
+# If you are using FastAPI with a media files directory, you might want to ignore the following:
+media/
+# If you are using FastAPI with a tests directory, you might want to ignore the following:
+tests/__pycache__/
+tests/*.pyc
+tests/*.pyo
+# If you are using FastAPI with a migrations directory, you might want to ignore the following:
+migrations/__pycache__/
+migrations/*.pyc
+migrations/*.pyo
+# If you are using FastAPI with a secrets directory, you might want to ignore the following:
+secrets/__pycache__/
+secrets/*.pyc
+secrets/*.pyo
+# If you are using FastAPI with a config directory, you might want to ignore the following:
+config/__pycache__/
+config/*.pyc
+config/*.pyo
+
+
+*.json
+
