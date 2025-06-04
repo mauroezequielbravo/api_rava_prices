@@ -51,6 +51,9 @@ def get_cedear() -> list:
 
     df = df.iloc[1:].reset_index(drop=True)  # Eliminar la primera fila si es el encabezado
 
+    df = df.applymap(lambda x: x.replace('.', '').replace(',', '.') if isinstance(x, str) else x)  # Reemplazar puntos y comas
+    df = df.applymap(lambda x: float(x) if isinstance(x, str) and x.replace('.', '', 1).isdigit() else x)  # Convertir a float
+
     # # Mostrar las primeras filas del DataFrame
     # print(df.head())
 
