@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import pandas as pd
+import time
 
 
 def get_cedear() -> list:
@@ -122,5 +123,43 @@ def get_bonos() -> list:
 
     # print(df.to_dict(orient='records'))  # Convertir a lista de diccionarios
     return df.to_dict(orient='records')  # Convertir a lista de diccionarios
+
+
+def get_acciones() -> list:
+    # Configurar opciones para Chrome en modo headless
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+
+    # Inicializar el driver de Chrome
+    driver = webdriver.Chrome(options=options)
+
+    try:
+        # Navegar a la página de cotizaciones
+        driver.get("https://www.rava.com/cotizaciones/acciones-argentinas")
+        time.sleep(5)  # Esperar a que la página cargue completamente
+
+        # Obtener todas las tablas de cotizaciones
+        tables = driver.find_elements(By.CSS_SELECTOR, "div.rava-box-shadow.table-a")
+
+        # Verificar que se encontraron las tablas
+        if len(tables) >= 2:
+            # Extraer HTML de las tablas
+            html_lider = tables[0].get_attribute('outerHTML')
+            html_general = tables[1].get_attribute('outerHTML')
+
+            # Convertir HTML a DataFrame
+            df_lider = pd.read_html(html_lider)[0]
+            df_general = pd.read_html(html_general)[0]
+
+            df_todo = pd.concat([df_lider, df_general], ignore_index=True)
+            return df_todo.to_dict(orient='records')
+        else:
+            print("No se encontraron las tablas esperadas.")
+    finally:
+        # Cerrar el navegador
+        driver.quit()   
 
 
