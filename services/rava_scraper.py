@@ -54,6 +54,9 @@ def get_cedear() -> list:
     df = df.applymap(lambda x: x.replace('.', '').replace(',', '.') if isinstance(x, str) else x)  # Reemplazar puntos y comas
     df = df.applymap(lambda x: float(x) if isinstance(x, str) and x.replace('.', '', 1).isdigit() else x)  # Convertir a float
 
+    # remplaza los guiones por none
+    df = df.replace('-', None)
+
     # # Mostrar las primeras filas del DataFrame
     # print(df.head())
 
